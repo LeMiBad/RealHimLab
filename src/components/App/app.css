@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+
+
+
+
+@keyframes burgerOpen {
+    0% {
+        transform: translateX(-100%);
+    }
+    
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes burgerClose {
+    0% {
+        transform: translateX(0);
+    }
+    
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes scale {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.4);
+    }
+}
+
+
+.buttonClick {
+    animation: scale 0.2s;
+}
+
+.phone {
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.special-label {
+    display: none;
+}
+
+.country-list {
+    height: 145px;
+}
