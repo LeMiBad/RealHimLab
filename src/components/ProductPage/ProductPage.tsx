@@ -78,6 +78,7 @@ const NameWrapper = styled.div<{dark: boolean}>`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
     h1 {
         color: ${props => props.dark? 'white' : 'black'};
         font-size: 24px;
