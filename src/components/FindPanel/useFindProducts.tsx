@@ -1,16 +1,16 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
-import { IProduct } from "../../types/types"
-import useAxiosConfig from "../../hooks/useAxiosConfig"
+import { IProduct, ISalePrice } from "../../types/types"
 import { useStore } from "effector-react"
 import { $pickedSaleDot } from "../../store/pickedSaleDot"
-import { $categories } from "../../store/skladData"
-import { сategoriesParse } from './../../utils/parsers'
+import { $acces, $categories } from "../../store/skladData"
+import { splitArr, сategoriesParse } from './../../utils/parsers'
+import { API } from "../../utils/api"
 
 
 const useFindProducts = () => {
     const [req, setReq] = useState('')
-    const config = useAxiosConfig()
+    const {access_token} = useStore($acces)
     const [isLoading, setIsLoading] = useState(true)
     const [filted, setFilted] = useState<IProduct[]>([])
     const saleDot = useStore($pickedSaleDot)
@@ -25,19 +25,33 @@ const useFindProducts = () => {
             return
         }
         else {
-            const categoryPath = сategoriesParse(allCategories).map(category => `pathName=${category.folder_name};`).join(';')
-            axios(`https://www.mc.optimiser.website/api/remap/1.2/entity/product?search=${req}&filter=${categoryPath}`, config)
+            const caters = splitArr(сategoriesParse(allCategories).map(cat => `pathName=${cat.folder_name};`).filter(str => str.includes(req)), allCategories.length < 11? 1 : 5).map(spl => spl.join(''))
+
+            for(let i = 0; i < caters.length; i++) {
+                axios(`${API.path}remap/1.2/entity/product?search=${req}&filter=${caters[i]}`, API.configs.get(access_token))
                 .then((data) => {
-                    const products = data.data.rows.map((prod: IProduct) => {
-                        if (saleDot && saleDot.current_price_type && saleDot.current_price_type.price_id === 'minimal_price') {
-                            prod.salePrices[0].value = prod.minPrice.value / 100
+                    const products = data.data.rows.map((product: IProduct) => {
+                        let currentPrice: ISalePrice = product.salePrices[0]
+                        product.salePrices.forEach(priceObj => {
+                            if(saleDot && saleDot.current_price_type && priceObj.priceType.name === saleDot.current_price_type.price_name) {
+                                currentPrice = priceObj
+                            }
+                        })
+
+
+                        if(saleDot && saleDot.current_price_type && saleDot.current_price_type.price_id  === 'minimal_price') {
+                            product.salePrices[0].value = product.minPrice.value / 100
                         }
-                        return prod
+                        else {
+                            product.salePrices[0].value = currentPrice.value / 100
+                        }
+                        return product
                     })
 
                     setFilted(products)
                     setIsLoading(false)
                 })
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [req])

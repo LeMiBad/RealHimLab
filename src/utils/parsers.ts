@@ -13,6 +13,11 @@ export const сategoriesParse = (arr: CategoryObject[]): ICategory[] => {
     return categories;
 }
 
+
+export const splitArr = (arr: any[], chunks: number) =>
+    [...Array(chunks)].map((_, c) => arr.filter((n, i) => i % chunks === c));
+
+
 // export const returnParentCategory = (allCategories: CategoryObject[] | null, category: CategoryObject, branch?: CategoryObject) => {
 //     if(allCategories) {
 //         allCategories.forEach(categoryObj => {
