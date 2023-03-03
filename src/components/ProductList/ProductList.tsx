@@ -55,7 +55,7 @@ const CategoryCard = styled.div<{dark: boolean}>`
     background-color: ${props => props.dark? 'white' : 'black'};
     color: ${props => props.dark? 'black' : 'white'};
     border-radius: 7px;
-    text-align: center;
+    text-align: left;
     display: flex;
     padding-left: 5%;
     font-weight: 300;
