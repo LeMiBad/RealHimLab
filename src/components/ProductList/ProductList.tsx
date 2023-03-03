@@ -148,19 +148,25 @@ const ProductList = () => {
                             : null
                         }
                         </CategoryWrapper>
-                        <h1 style={{fontSize: 28, fontWeight: 400, color: dark? 'white' : 'black', marginBottom: '0.5vh', marginTop: '1.5vh'}}>Товары</h1>
-                        {sortByGroup(products, 2, loadIndex).map((row, i: number, arr) => {
-                            return <ProductRow key={i}
-                            ref={i === arr.length-1? ref : null}
-                            >
-                                {row.map((data: IProduct | null) => {
-                                    return data? <Product
-                                    key={data.code}
-                                    data={data}
-                                /> : null
+                        {
+                            products?.length? <>
+                                <h1 style={{fontSize: 28, fontWeight: 400, color: dark? 'white' : 'black', marginBottom: '0.5vh', marginTop: '1.5vh'}}>Товары</h1>
+                                {sortByGroup(products, 2, loadIndex).map((row, i: number, arr) => {
+                                    return <ProductRow key={i}
+                                    ref={i === arr.length-1? ref : null}
+                                    >
+                                        {row.map((data: IProduct | null) => {
+                                            return data? <Product
+                                            key={data.code}
+                                            data={data}
+                                        /> : null
+                                        })}
+                                    </ProductRow>
                                 })}
-                            </ProductRow>
-                        })}
+                            </>
+                            :
+                            null
+                        }
                     </> 
                     :
                     products && products.length? 
