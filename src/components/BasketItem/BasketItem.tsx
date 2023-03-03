@@ -63,6 +63,10 @@ const ActionWrapper = styled.div<{height: string, dark: boolean, red?: boolean}>
     align-items: center;
 `
 
+const Bold = styled.span`
+    font-weight: 600;
+`
+
 
 const BasketItem: React.FC<BasketItemProps> = ({ data, i }) => {
     const {dark} = useStore($tgInfo)
@@ -82,8 +86,8 @@ const BasketItem: React.FC<BasketItemProps> = ({ data, i }) => {
             <StyledBasketProps dark={dark}>
                 <div style={{marginTop: "10px", fontSize: 16, fontWeight: 500, width: '170px', wordWrap: 'break-word'}}>{data.data.name}</div>
                 <div>
-                    <h4 style={{fontWeight: 400, fontSize: 14}}>Количество: {data.counter} шт</h4>
-                    <h4 style={{fontWeight: 400, fontSize: 14}}>Цена/ед.товара {data.data.salePrices[0].value}₽</h4>
+                    <h4 style={{fontWeight: 400, fontSize: 14}}>Количество: <Bold>{data.counter}</Bold>шт</h4>
+                    <h4 style={{fontWeight: 400, fontSize: 14}}>Цена/ед.товара <Bold>{data.data.salePrices[0].value}</Bold>₽</h4>
                 </div>
                 <h3 style={{marginBottom: "10px", fontWeight: 600}}>{+data.data.salePrices[0].value * data.counter} {valute}</h3>
             </StyledBasketProps>
