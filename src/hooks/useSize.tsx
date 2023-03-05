@@ -21,7 +21,6 @@ const useValute = (data: IProduct | undefined) => {
             
             else axios(priceLink, config)
                 .then((data) => {
-                        console.log(data.data.name)
                         sizeStoreUpdate({url: priceLink, size: data.data.name})
                         setSize(data.data.name)
                     })
