@@ -3,6 +3,7 @@ import { useEffect } from "react"
 import { $category, setCategory } from "../../store/pickedCategory"
 import { $pickedSaleDot } from "../../store/pickedSaleDot"
 import { $acces, $categories, getCategories, getProducts } from "../../store/skladData"
+import { getChildsFolders } from "../../utils/parsers"
 
 
 
@@ -25,8 +26,20 @@ const useBurgerUtils = () => {
     }, [])
 
     useEffect(() => {
-        if(saleDot) getProducts({acces: access_token, category: activeCategory? activeCategory.category.folder_name : categories, saleDot})
+        if(saleDot) {
+            if(activeCategory) getProducts({acces: access_token, category: getChildsFolders(activeCategory), saleDot})
+            else {
+                const final: any = []
+
+                categories.forEach(cat => {
+                    final.push(...getChildsFolders(cat))
+                })
+
+                getProducts({acces: access_token, category: final, saleDot})
+            }
+        }
     }, [access_token, activeCategory, categories, saleDot])
+
     
     return {saleDot, categories, access_token}
 }

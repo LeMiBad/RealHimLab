@@ -13,7 +13,7 @@ import Loader from "../Ui/Loader/Loader"
 import Product from "../Product/Product"
 import ProductPage from "../ProductPage/ProductPage"
 import { $category, setCategory } from "../../store/pickedCategory"
-import { categoryNameParser, findParentCategory } from "../../utils/parsers"
+import { categoryNameParser, findParentCategory, getChildsFolders } from "../../utils/parsers"
 import { $pickedSaleDot } from "../../store/pickedSaleDot"
 import ArrowIcon from "../Ui/ArrowIcon/ArrowIcon"
 
@@ -112,13 +112,22 @@ const ProductList = () => {
     }, [products])
 
     const pickCategory = (category: CategoryObject | null) => {
+        console.log(123)
         if(category) { 
             setCategory(category)
             if(saleDot) getProducts({acces: access_token, category: category.category.folder_name, saleDot})
         }
         else {
             setCategory(null)
-            if(saleDot) getProducts({acces: access_token, category: categories, saleDot})
+            if(saleDot) {
+                const final: CategoryObject[] = []
+
+                categories.forEach(cat => {
+                    final.push(...getChildsFolders(cat))
+                })
+
+                getProducts({acces: access_token, category: final, saleDot})
+            }
         }
     }
 
@@ -139,7 +148,7 @@ const ProductList = () => {
                     <>
                         {currentCategory? <div style={{display: 'flex', alignItems: 'center', marginBottom: '1.5vh'}}>
                             <ArrowIcon BackgroundOff func={() => pickCategory(findParentCategory(categories, currentCategory))}/>
-                            <h1 style={{fontSize: 28, fontWeight: 400, color: dark? 'white' : 'black'}}>Категории</h1>
+                            <h1 style={{fontSize: 28, fontWeight: 400, color: dark? 'white' : 'black', width: '90%'}}>{currentCategory? currentCategory.category.user_folder_name? currentCategory.category.user_folder_name : categoryNameParser(currentCategory.category.folder_name, currentCategory? currentCategory.padding : 0) : 'Все товары'}</h1>
                         </div> : <></>}
                         <CategoryWrapper>
                             {/* {currentCategory? <CategoryCard dark={dark}>Назад</CategoryCard> : null} */}

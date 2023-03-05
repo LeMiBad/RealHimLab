@@ -3,6 +3,8 @@ import axios from "axios";
 import { createEvent, createStore } from "effector";
 import { createEffect } from 'effector'
 import { CategoryObject, IAcces, ICategory, IProduct, ISalePoint } from "../types/types";
+import { sortProductPairsByNames, splitArr } from '../utils/parsers';
+import { API } from '../utils/api';
 
 
 
@@ -23,6 +25,7 @@ export const getShopAcces = createEffect(async (id: string) => {
     const url = `https://www.mc.optimiser.website/api/optimiser/2.0/apps/shop_info/${id}`
     const data = await axios(url)
     setAccId(data.data.account_id)
+    console.log(data.data)
     return data.data
 })
 
@@ -108,47 +111,65 @@ export const $categories = createStore<CategoryObject[]>([])
             },
         }
         
-        if(typeof category !== 'string') category = category.map(cat => `pathName=${cat.category.folder_name};`).join('')
-        else category = 'pathName=' + category
-        const url = `https://www.mc.optimiser.website/api/remap/1.2/entity/product?filter=${category}`
-    
-    
-        if (cashedCategory[url]) return cashedCategory[url]
         
-        const data = await axios(url, config)
-        const newArr = []
-        let beetweenArr = []
-        for(let i = 0; i < data.data.rows.length; i++) {
-            const product: IProduct = data.data.rows[i]
-            let currentPrice: ISalePrice = product.salePrices[0]
-            product.salePrices.forEach(priceObj => {
-                if(priceObj.priceType.name === saleDot.current_price_type.price_name) {
-                    currentPrice = priceObj
+        let urls: any[]
+        let Allcategories: string
+        
+        
+        if(typeof category !== 'string') {
+            const caters = splitArr(category.map(cat => `pathName=${cat.category.folder_name};`), category.length < 16? 1 : Math.round(category.length/20)).map(spl => spl.join(''))
+            
+        
+            urls = caters
+            Allcategories = category.map(cat => `pathName=${cat.category.folder_name};`).join('')
+        }
+        else {
+            urls = ['pathName=' + category]
+            Allcategories = 'pathName=' + category
+        }
+        
+        if (cashedCategory[Allcategories]) return cashedCategory[Allcategories]
+        
+        const result = []
+
+        
+        for(let j = 0; j < urls.length; j++) {
+            if(!urls[j].length) continue
+            const data = await axios.get(`${API.path}remap/1.2/entity/product?filter=${urls[j]}`, config)
+            let beetweenArr = []
+
+            for(let i = 0; i < data.data.rows.length; i++) {
+                const product: IProduct = data.data.rows[i]
+                let currentPrice: ISalePrice = product.salePrices[0]
+                product.salePrices.forEach(priceObj => {
+                    if(priceObj.priceType.name === saleDot.current_price_type.price_name) {
+                        currentPrice = priceObj
+                    }
+                })
+
+
+                if(saleDot.current_price_type.price_id  === 'minimal_price') {
+                    product.salePrices[0].value = product.minPrice.value / 100
                 }
-            })
-    
-    
-            if(saleDot.current_price_type.price_id  === 'minimal_price') {
-                product.salePrices[0].value = product.minPrice.value / 100
-            }
-            else {
-                product.salePrices[0].value = currentPrice.value / 100
-            }
-    
-            beetweenArr.push(product)
-    
-    
-            if(beetweenArr.length === 2) {
-                newArr.push(beetweenArr)
-                beetweenArr =[]
-            }
-            else if(beetweenArr.length === 1 && i === data.data.rows.length-1) {
-                newArr.push([product, null])
+                else {
+                    product.salePrices[0].value = currentPrice.value / 100
+                }
+
+                beetweenArr.push(product)
+
+
+                if(beetweenArr.length === 2) {
+                    result.push(beetweenArr)
+                    beetweenArr =[]
+                }
+                else if(beetweenArr.length === 1 && i === data.data.rows.length-1) {
+                    result.push([product, null])
+                }
             }
         }
         
-        cashedCategory[url] = newArr
-        return newArr
+        cashedCategory[Allcategories] = sortProductPairsByNames(result)
+        return sortProductPairsByNames(result)
     })
     
 

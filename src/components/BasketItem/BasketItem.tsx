@@ -7,6 +7,7 @@ import { $tgInfo } from "../../store/tgData"
 import LoadImage from "../Ui/LoadImage/LoadImage"
 import NotAImage from "../Product/NotImage"
 import useValute from "../../hooks/useValute"
+import useSize from "../../hooks/useSize"
 
 
 interface BasketItemProps {
@@ -71,14 +72,15 @@ const Bold = styled.span`
 const BasketItem: React.FC<BasketItemProps> = ({ data, i }) => {
     const {dark} = useStore($tgInfo)
     const {images, isLoading} = useProductImages(data.data)
-    const valute = useValute(data.data)    
+    const valute = useValute(data.data)   
+    const size = useSize(data.data) 
 
     return <StyledBasketItem dark={dark}>
         <div style={{display: 'flex', alignItems: "center", gap: 5}}>
             {isLoading? 
                 <LoadImage/>
                 : 
-                images[0]? 
+                images[0]?
                     <StyledBasketImg src={images[0]}/>
                 : 
                     <div style={{width: '20vw', padding: 5, boxSizing: 'border-box'}}><NotAImage/></div>
@@ -86,7 +88,7 @@ const BasketItem: React.FC<BasketItemProps> = ({ data, i }) => {
             <StyledBasketProps dark={dark}>
                 <div style={{marginTop: "10px", fontSize: 16, fontWeight: 500, width: '170px', wordWrap: 'break-word'}}>{data.data.name}</div>
                 <div>
-                    <h4 style={{fontWeight: 400, fontSize: 14}}>Количество: <Bold>{data.counter}шт</Bold></h4>
+                    <h4 style={{fontWeight: 400, fontSize: 14}}>Количество: <Bold>{data.counter}{size}</Bold></h4>
                     <h4 style={{fontWeight: 400, fontSize: 14}}>Цена/ед.товара <Bold>{data.data.salePrices[0].value}₽</Bold></h4>
                 </div>
                 <h3 style={{marginBottom: "10px", fontWeight: 600}}>{+data.data.salePrices[0].value * data.counter} {valute}</h3>

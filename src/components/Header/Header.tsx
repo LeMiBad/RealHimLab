@@ -44,7 +44,7 @@ const Header = () => {
         <StyledHeader dark={dark}>
             <div style={{display: 'flex', alignItems: 'center', gap: 10, fontSize: 10}}>
                 <Burger/>
-                <h1 style={{color: dark? 'white' : 'black', fontSize: 18}}>{cat? cat.category.user_folder_name? cat.category.user_folder_name : categoryNameParser(cat.category.folder_name, cat? cat.padding : 0) : 'Все товары'}</h1>
+                <h1 style={{color: dark? 'white' : 'black', fontSize: 18}}>Категории</h1>
             </div>
             <StyledHeaderSection>
                 <FindPanel/>

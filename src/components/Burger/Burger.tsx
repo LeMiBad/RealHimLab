@@ -8,6 +8,7 @@ import ArrowIcon from "../Ui/ArrowIcon/ArrowIcon"
 import useBurgerUtils from "./useBurgerUtils"
 import { setCategory } from "../../store/pickedCategory"
 import CategoryItem from "../CategoryItem/CategoryItem"
+import { getChildsFolders } from "../../utils/parsers"
 
 
 const BurgerMenuWrapper = styled.div<{dark: boolean}>`
@@ -58,10 +59,20 @@ const Burger = () => {
     
 
     const pickAllProducts = () => {
-        switchHandler()
-        setLazyLoad(1)
-        setCategory(null)
-        if(saleDot) getProducts({acces: access_token, saleDot, category: categories})
+        if(categories.length) {
+            switchHandler()
+            setLazyLoad(1)
+            setCategory(null)
+            if(saleDot) {
+                const final: any = []
+
+                categories.forEach(cat => {
+                    final.push(...getChildsFolders(cat))
+                })
+            
+                getProducts({acces: access_token, category: final, saleDot})
+            }
+        }
     }
 
 

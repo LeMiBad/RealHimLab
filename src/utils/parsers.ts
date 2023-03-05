@@ -1,4 +1,4 @@
-import { CategoryObject, ICategory } from './../types/types';
+import { CategoryObject, ICategory, IProduct } from './../types/types';
 
 
 export const сategoriesParse = (arr: CategoryObject[]): ICategory[] => {
@@ -35,6 +35,52 @@ export const splitArr = (arr: any[], chunks: number) =>
 //         }
 //     }
 // }
+
+
+export const getChildsFolders = (currentCategory: CategoryObject) => {
+    if(currentCategory.child === null) return [currentCategory]
+    let folders: CategoryObject[] = [];
+    folders.push(currentCategory);
+    if (currentCategory.child) {
+        for (const child of currentCategory.child) {
+            folders = folders.concat(getChildsFolders(child));
+        }
+    }
+
+    
+    folders.reverse()
+    return folders
+}
+
+
+export function sortProductPairsByNames(products: Array<IProduct | null>[]): IProduct[][] {
+    
+
+    const result: IProduct[] = []
+
+    products.forEach(arr => {
+        arr.forEach((item: IProduct | null) => {
+            if(item)result.push(item)
+        })
+    })
+
+    const sortedProducts = result.sort((a, b) => a.name.localeCompare(b.name));
+    const numProducts = sortedProducts.length;
+    const numPairs = Math.floor(numProducts / 2);
+    
+    const productPairs = new Array(numPairs);
+    for (let i = 0; i < numPairs; i++) {
+        productPairs[i] = [sortedProducts[2 * i], sortedProducts[2 * i + 1]];
+    }
+    
+    if (numProducts % 2 !== 0) {
+        productPairs.push([sortedProducts[numProducts - 1], null]);
+    }
+    
+    return productPairs;
+}
+
+
 
 export const findParentCategory = (categories: CategoryObject[], currentCategory: CategoryObject): CategoryObject | null => {
     for (const category of categories) {
