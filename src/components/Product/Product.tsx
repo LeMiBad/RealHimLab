@@ -2,7 +2,7 @@ import { useStore } from "effector-react"
 import styled from "styled-components"
 import usePage from "../../hooks/usePage"
 import useProductImages from "../../hooks/useImages"
-import { $acces } from "../../store/skladData"
+import { $acces, $allow_sync_sklad } from "../../store/skladData"
 import { IProduct } from "../../types/types"
 import LoadImage from "../Ui/LoadImage/LoadImage"
 import {productUpdate} from './../../store/ProductPage'
@@ -12,6 +12,8 @@ import { $pickedSaleDot } from "../../store/pickedSaleDot"
 import Tost from "./Tost"
 import useTost from "../../hooks/useTost"
 import useValute from "../../hooks/useValute"
+import { API } from "../../utils/api"
+import axios from "axios"
 
 
 
@@ -88,6 +90,7 @@ const Product: React.FC<ProductItemProps> = ({data}) => {
     const {access_token} = useStore($acces)
     const {tost, setTost} = useTost()
     const valute = useValute(data)
+    const allowSync = useStore($allow_sync_sklad)
 
     const addBasketItemHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: IProduct) => {
         addBasketItem(
@@ -106,10 +109,34 @@ const Product: React.FC<ProductItemProps> = ({data}) => {
     }
 
     const plusButtonHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: IProduct) => {
-        if(product.variantsCount) toProductPage()
+        console.log(product.variantsCount)
+        if(product.variantsCount || product.variantsCount < 1) toProductPage()
         else {
-            addBasketItemHandler(e, product); 
-            setTost([...tost, product.name])
+            if(allowSync) {
+                if(product.id.length) {
+                    const url = `${API.path}remap/1.2/report/stock/bystore/current?filter=assortmentId=${product.id};storeId=${saleDot? saleDot.sklad_id : ''}`
+                    axios(url, API.configs.get(access_token))
+                    .then(data => {
+                        console.log(data.data)
+                        if(data.data.length) {
+                            if(data.data[0].stock < 0) {
+                                toProductPage()
+                            }
+                            else {
+                                addBasketItemHandler(e, product); 
+                                setTost([...tost, product.name])
+                            }
+                        }
+                        else {
+                            toProductPage()
+                        }
+                    })
+                }
+            }
+            else {
+                addBasketItemHandler(e, product); 
+                setTost([...tost, product.name])
+            }
         }
     }
 
