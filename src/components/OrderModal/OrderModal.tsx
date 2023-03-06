@@ -213,7 +213,7 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
                         )}
                     />
                     <Input {...register('desk')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder="Коментарий (необязательно)"></Input>
-                    <Input {...register('location')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder={'Адрес доставки'}></Input>
+                    <Input {...register('location')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder={'Адрес'}></Input>
                     {validate? <MainButton focus={focus} onClick={accepHandler} dark={dark}>Оформить</MainButton>
                     : <MainButton warning={true} focus={focus} dark={dark}>Оформить</MainButton>}
                 </Modal>
