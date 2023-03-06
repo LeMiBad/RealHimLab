@@ -109,9 +109,9 @@ const Product: React.FC<ProductItemProps> = ({data}) => {
     }
 
     const plusButtonHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: IProduct) => {
-        console.log(product.variantsCount)
-        if(product.variantsCount || product.variantsCount < 1) toProductPage()
+        if(product.variantsCount) toProductPage()
         else {
+            console.log(allowSync)
             if(allowSync) {
                 if(product.id.length) {
                     const url = `${API.path}remap/1.2/report/stock/bystore/current?filter=assortmentId=${product.id};storeId=${saleDot? saleDot.sklad_id : ''}`
@@ -119,7 +119,7 @@ const Product: React.FC<ProductItemProps> = ({data}) => {
                     .then(data => {
                         console.log(data.data)
                         if(data.data.length) {
-                            if(data.data[0].stock < 0) {
+                            if(data.data[0].stock < 1) {
                                 toProductPage()
                             }
                             else {

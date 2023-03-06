@@ -26,7 +26,7 @@ const StyledTost = styled.p<{dark: boolean}>`
     padding: 18px 0;
     background-color: ${props => props.dark? 'white' : 'black'};
     color: ${props => props.dark? 'black' : 'white'};
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;

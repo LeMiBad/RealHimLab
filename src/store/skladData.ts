@@ -1,17 +1,19 @@
+import { sortProductPairsByNames, splitArr } from './../utils/parsers';
 import { ISalePrice } from './../types/types';
 import axios from "axios";
 import { createEvent, createStore } from "effector";
 import { createEffect } from 'effector'
 import { CategoryObject, IAcces, ICategory, IProduct, ISalePoint } from "../types/types";
-import { sortProductPairsByNames, splitArr } from '../utils/parsers';
 import { API } from '../utils/api';
 
 
 
 // Cash
-const cashedCategory: any = {}
-let allow_sync_sklad = false
-export const $allow_sync_sklad = createStore(allow_sync_sklad)
+interface ICachedCategory {
+    [category: string]: any;
+}
+
+const cashedCategory: ICachedCategory = {};
 // Cash
 
 export const setAccId = createEvent<string>()
@@ -22,10 +24,9 @@ export const $accId = createStore('')
 const initialAcces = { access_token: '', account_id: '', org_name: '' }
 
 export const getShopAcces = createEffect(async (id: string) => {
-    const url = `https://www.mc.optimiser.website/api/optimiser/2.0/apps/shop_info/${id}`
+    const url = `${API.path}optimiser/2.0/apps/shop_info/${id}`
     const data = await axios(url)
     setAccId(data.data.account_id)
-    console.log(data.data)
     return data.data
 })
 
@@ -34,16 +35,9 @@ export const $acces = createStore<IAcces>(initialAcces)
 
 
 export const getSalePoints = createEffect(async (clientId: string) => {
-    const config = {
-        headers: {
-            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-            "Accept": "*/*",
-            "Content-Type": "application/json",
-            'Access-Control-Allow-Credentials': "true"
-        },
-    }
+    const config = API.configs.get()
 
-    const url = `https://www.mc.optimiser.website/api/optimiser/2.0/apps/configure/${clientId}`
+    const url = `${API.path}optimiser/2.0/apps/configure/${clientId}`
     const data = await axios(url, config)
     return {sklads: data.data.current_sklad_id, skladSync: data.data.allow_sync_sklad}
 })
@@ -53,18 +47,11 @@ export const $salePoints = createStore<{sklads: ISalePoint[], skladSync: boolean
 
 
 export const getCategories = createEffect(async (clientId: string) => {
-    const config = {
-        headers: {
-            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-            "Accept": "*/*",
-            "Content-Type": "application/json",
-            'Access-Control-Allow-Credentials': "true"
-        },
-    }
+    const config = API.configs.get()
 
-    const url = `https://www.mc.optimiser.website/api/optimiser/2.0/apps/configure/${clientId}`
+    const url = `${API.path}optimiser/2.0/apps/configure/${clientId}`
     const data = await axios(url, config)
-    allow_sync_sklad = data.data.allow_sync_sklad
+    // allow_sync_sklad = data.data.allow_sync_sklad
     const categoriesParse = ({folders, current_folder_id}: { folders: ICategory[], current_folder_id: ICategory[] }) => {
 
         const slashCounter = (url: string) => (url.match(/\//g) || []).length
@@ -89,7 +76,6 @@ export const getCategories = createEffect(async (clientId: string) => {
             }
         })
 
-
         return foldersName
     }
 
@@ -100,24 +86,27 @@ export const $categories = createStore<CategoryObject[]>([])
     .on(getCategories.done, (_, { result }) => result)
 
 
+export const setAllowSyncSklad = createEffect(async (clientId: string) => {
+    const config = API.configs.get()
+
+    const url = `${API.path}optimiser/2.0/apps/configure/${clientId}`
+    const data = await axios(url, config)
+
+    return data.data.allow_sync_sklad
+})
+
+export const $allow_sync_sklad = createStore<boolean>(false)
+    .on(setAllowSyncSklad.done, (_, { result }) => result)
+
+    
     export const getProducts = createEffect(async ({acces, category, saleDot}: {acces: string, category: string | CategoryObject[], saleDot: any}) => {
-        const config = {
-            headers: {
-                "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-                "Accept": "*/*",
-                "Content-Type": "application/json",
-                'Access-Control-Allow-Credentials': "true",
-                "Authorization": `Bearer ${acces}`
-            },
-        }
-        
-        
+        const config = API.configs.get(acces)
         let urls: any[]
         let Allcategories: string
         
         
         if(typeof category !== 'string') {
-            const caters = splitArr(category.map(cat => `pathName=${cat.category.folder_name};`), category.length < 16? 1 : Math.round(category.length/20)).map(spl => spl.join(''))
+            const caters = splitArr(category.map(cat => `pathName=${cat.category.folder_name};`), category.length < 16? 1 : Math.round(category.length/30)).map(spl => spl.join(''))
             
         
             urls = caters
@@ -130,16 +119,13 @@ export const $categories = createStore<CategoryObject[]>([])
         
         if (cashedCategory[Allcategories]) return cashedCategory[Allcategories]
         
-        const result = []
+        const result: any = []
+        let beetweenArr: any = []
 
-        
-        for(let j = 0; j < urls.length; j++) {
-            if(!urls[j].length) continue
-            const data = await axios.get(`${API.path}remap/1.2/entity/product?filter=${urls[j]}`, config)
-            let beetweenArr = []
+        const data = await Promise.all(urls.map(url => axios.get(`${API.path}remap/1.2/entity/product?filter=${url}`, config)))
 
-            for(let i = 0; i < data.data.rows.length; i++) {
-                const product: IProduct = data.data.rows[i]
+        data.forEach(row => {
+            row.data.rows.forEach((product: IProduct, i: number, arr: IProduct[]) => {
                 let currentPrice: ISalePrice = product.salePrices[0]
                 product.salePrices.forEach(priceObj => {
                     if(priceObj.priceType.name === saleDot.current_price_type.price_name) {
@@ -162,11 +148,12 @@ export const $categories = createStore<CategoryObject[]>([])
                     result.push(beetweenArr)
                     beetweenArr =[]
                 }
-                else if(beetweenArr.length === 1 && i === data.data.rows.length-1) {
+                else if(beetweenArr.length === 1 && i === arr.length-1) {
                     result.push([product, null])
                 }
-            }
-        }
+            })
+        })
+
         
         cashedCategory[Allcategories] = sortProductPairsByNames(result)
         return sortProductPairsByNames(result)

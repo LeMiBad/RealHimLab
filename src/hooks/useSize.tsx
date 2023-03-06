@@ -15,7 +15,7 @@ const useValute = (data: IProduct | undefined) => {
 
     
     useEffect(() => {
-        if(data && data.buyPrice.currency.meta.href.split('/')[8]) {
+        if(data && data.uom) {
             const priceLink = `${API.path}remap/1.2/entity/uom/${data?.uom.meta.href.split('/')[8]}`
             if(cashedValute[priceLink]) setSize(cashedValute[priceLink])
             

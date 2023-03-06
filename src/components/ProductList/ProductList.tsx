@@ -179,9 +179,7 @@ const ProductList = () => {
                     </> 
                     :
                     products && products.length? 
-                        <ProductsOut>
-                            <h1 style={{color: dark? 'white' : 'black', fontSize: 26}}>Товары отсутствуют :(</h1>
-                        </ProductsOut>
+                        <Loader></Loader> 
                     :
                         <Loader></Loader> 
                 }
