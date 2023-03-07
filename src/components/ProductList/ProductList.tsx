@@ -112,7 +112,6 @@ const ProductList = () => {
     }, [products])
 
     const pickCategory = (category: CategoryObject | null) => {
-        console.log(123)
         if(category) { 
             setCategory(category)
             if(saleDot) getProducts({acces: access_token, category: category.category.folder_name, saleDot})

@@ -106,7 +106,7 @@ export const $allow_sync_sklad = createStore<boolean>(false)
         
         
         if(typeof category !== 'string') {
-            const caters = splitArr(category.map(cat => `pathName=${cat.category.folder_name};`), category.length < 16? 1 : Math.round(category.length/30)).map(spl => spl.join(''))
+            const caters = splitArr(category.map(cat => `pathName=${cat.category.folder_name};`), category.length < 16? 1 : Math.round(category.length/20)).map(spl => spl.join(''))
             
         
             urls = caters
@@ -116,6 +116,7 @@ export const $allow_sync_sklad = createStore<boolean>(false)
             urls = ['pathName=' + category]
             Allcategories = 'pathName=' + category
         }
+        
         
         if (cashedCategory[Allcategories]) return cashedCategory[Allcategories]
         

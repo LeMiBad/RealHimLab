@@ -111,13 +111,11 @@ const Product: React.FC<ProductItemProps> = ({data}) => {
     const plusButtonHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: IProduct) => {
         if(product.variantsCount) toProductPage()
         else {
-            console.log(allowSync)
             if(allowSync) {
                 if(product.id.length) {
                     const url = `${API.path}remap/1.2/report/stock/bystore/current?filter=assortmentId=${product.id};storeId=${saleDot? saleDot.sklad_id : ''}`
                     axios(url, API.configs.get(access_token))
                     .then(data => {
-                        console.log(data.data)
                         if(data.data.length) {
                             if(data.data[0].stock < 1) {
                                 toProductPage()
