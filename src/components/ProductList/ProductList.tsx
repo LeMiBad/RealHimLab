@@ -1,9 +1,9 @@
 import { useStore } from "effector-react"
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import styled from "styled-components"
 import useOpen from "../../hooks/useOpeningSwitcher"
-import { $lazyLoad, setLazyLoad } from "../../store/lazyLoadIndex"
+import { $lazyLoad, clearLazyLoad, setLazyLoad } from "../../store/lazyLoadIndex"
 import { setCurVariant } from "../../store/ProductPage"
 import { $acces, $categories, $products, getProducts } from "../../store/skladData"
 import { $tgInfo } from "../../store/tgData"
@@ -40,7 +40,6 @@ const ProductListStyled = styled.div`
     margin: 55px auto 0 auto;
     flex-direction: column;
     padding-bottom: 10vh;
-    /* gap: 3vh; */
 `
 
 const CategoryWrapper = styled.div`
@@ -68,22 +67,14 @@ const ProductRow = styled.div`
     display: flex;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 3vh;
-`
-
-const ProductsOut = styled.div`
-    height: 90vh;
-    margin-top: 10vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin-bottom: 15px;
 `
 
 
 const ProductList = () => {
     const {openState, switchHandler} = useOpen()
     const [isLoading, setIsLoaing] = useState(true)
+    const [imgLoading, setImgLoading] = useState(true)
     const {dark} = useStore($tgInfo)
     const {access_token} = useStore($acces)
     const products = useStore($products)
@@ -93,10 +84,12 @@ const ProductList = () => {
     const saleDot = useStore($pickedSaleDot)
     const myRef = useRef<HTMLDivElement>(null)
 
-    const {ref, inView} = useInView()
+
+    const {ref, inView} = useInView({delay: 100})
+
 
     useEffect(() => {
-        setLazyLoad(1)
+        clearLazyLoad()
         setCurVariant(0)
         getProducts.pending.watch(pending => {
             setIsLoaing(pending)
@@ -112,27 +105,21 @@ const ProductList = () => {
     }, [products])
 
     const pickCategory = (category: CategoryObject | null) => {
-        if(category) { 
+        if(category && saleDot) { 
             setCategory(category)
-            if(saleDot) getProducts({acces: access_token, category: category.category.folder_name, saleDot})
+            getProducts({acces: access_token, category: getChildsFolders(category), saleDot})
         }
         else {
             setCategory(null)
-            if(saleDot) {
-                const final: CategoryObject[] = []
-
-                categories.forEach(cat => {
-                    final.push(...getChildsFolders(cat))
-                })
-
-                getProducts({acces: access_token, category: final, saleDot})
-            }
+            getProducts({acces: access_token, category: categories, saleDot})
         }
     }
 
 
     useEffect(() => {
-        if(products && loadIndex < Math.ceil(products.length/2) && inView === true) setLazyLoad(loadIndex+1)
+        if(products && loadIndex < Math.ceil(products.length/2) && inView) {
+            setLazyLoad(loadIndex+1)
+        }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inView])
 
@@ -150,7 +137,6 @@ const ProductList = () => {
                             <h1 style={{fontSize: 28, fontWeight: 400, color: dark? 'white' : 'black', width: '90%'}}>{currentCategory? currentCategory.category.user_folder_name? currentCategory.category.user_folder_name : categoryNameParser(currentCategory.category.folder_name, currentCategory? currentCategory.padding : 0) : 'Все товары'}</h1>
                         </div> : <></>}
                         <CategoryWrapper>
-                            {/* {currentCategory? <CategoryCard dark={dark}>Назад</CategoryCard> : null} */}
                             {currentCategory && currentCategory.child? 
                             currentCategory.child.map((cat, index) => <CategoryCard onClick={() => pickCategory(cat)} key={index} dark={dark}>{categoryNameParser(cat.category.folder_name, cat.padding)}</CategoryCard>)
                             : null
@@ -160,9 +146,7 @@ const ProductList = () => {
                             products?.length? <>
                                 <h1 style={{fontSize: 28, fontWeight: 400, color: dark? 'white' : 'black', marginBottom: '0.5vh', marginTop: '1.5vh'}}>Товары</h1>
                                 {sortByGroup(products, 2, loadIndex).map((row, i: number, arr) => {
-                                    return <ProductRow key={i}
-                                    ref={i === arr.length-1? ref : null}
-                                    >
+                                    return <ProductRow key={i} ref={i === arr.length-1? ref : null} >
                                         {row.map((data: IProduct | null) => {
                                             return data? <Product
                                             key={data.code}
@@ -171,15 +155,17 @@ const ProductList = () => {
                                         })}
                                     </ProductRow>
                                 })}
-                            </>
-                            :
+                            </> 
+                            : 
                             null
                         }
                     </> 
                     :
                     products && products.length? 
                         <Loader></Loader> 
-                    :
+                        :
+                        
+                        // <ProductsOut/>
                         <Loader></Loader> 
                 }
             </ProductListStyled> 
