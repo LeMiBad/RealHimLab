@@ -51,7 +51,7 @@ const Modal = styled.form<{dark: boolean, focus: boolean}>`
     flex-direction: column;
     padding: 10% 10%;
     box-sizing: border-box;
-    gap: 5%;
+    gap: 6%;
     position: relative;
 `
 
@@ -87,8 +87,8 @@ const RadioButtonWrapper = styled.div<{dark: boolean}>`
     ${props => props.dark? 'border: 1px solid black;' : ''}
     position: relative;
     h1 {
-        font-size: 17px;
-        font-weight: 400;
+        font-size: 16px;
+        font-weight: 300;
     }
 `
 
@@ -104,8 +104,8 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
     const [isEnd, setIsEnd] = useState(false)
     const [validate, setValidate] = useState(false)
     const {register, control, getValues} = useForm<IForm>({defaultValues: {phone: '', name: tgUserName}})
-    const [isChecked, setIsChecked] = useState(true)
-    const [isChecked2, setIsChecked2] = useState(false)
+    const [isChecked, setIsChecked] = useState(false)
+    const [isChecked2, setIsChecked2] = useState(true)
     const handleCheck = () => {
         if (!isChecked) {
             setIsChecked(true)
@@ -246,24 +246,26 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
                             />
                         )}
                     />
-                    <RadioButtonWrapper dark={dark} onClick={handleCheck2}>
-                        <h1>Доставка</h1>
-                        <div style={{marginBottom: 6}}>
-                            <RadioButton checked={isChecked2} />
-                        </div>
-                        <div style={{position: 'absolute', width: '100%', height: '100%', zIndex: 3000}}>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: 15}}>
+                        <RadioButtonWrapper dark={dark} onClick={handleCheck2}>
+                            <h1>Доставка</h1>
+                            <div style={{marginBottom: 6}}>
+                                <RadioButton checked={isChecked2} />
+                            </div>
+                            <div style={{position: 'absolute', width: '100%', height: '100%', zIndex: 3000}}>
 
-                        </div>
-                    </RadioButtonWrapper>
-                    <RadioButtonWrapper dark={dark} onClick={handleCheck}>
-                        <h1>Самовызов</h1>
-                        <div style={{marginBottom: 6}}>
-                            <RadioButton checked={isChecked} />
-                        </div>
-                        <div style={{position: 'absolute', width: '100%', height: '100%', zIndex: 3000}}>
+                            </div>
+                        </RadioButtonWrapper>
+                        <RadioButtonWrapper dark={dark} onClick={handleCheck}>
+                            <h1>Самовызов</h1>
+                            <div style={{marginBottom: 6}}>
+                                <RadioButton checked={isChecked} />
+                            </div>
+                            <div style={{position: 'absolute', width: '100%', height: '100%', zIndex: 3000}}>
 
-                        </div>
-                    </RadioButtonWrapper>
+                            </div>
+                        </RadioButtonWrapper>
+                    </div>
                     <Input {...register('desk')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder="Коментарий (необязательно)"></Input>
                     {
                         isChecked2?
