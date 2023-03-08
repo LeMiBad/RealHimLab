@@ -85,6 +85,7 @@ const RadioButtonWrapper = styled.div<{dark: boolean}>`
     align-items: center;
     border-radius: 5px;
     ${props => props.dark? 'border: 1px solid black;' : ''}
+    position: relative;
     h1 {
         font-size: 20px;
         font-weight: 400;
@@ -237,6 +238,9 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
                         <h1>Самовызов</h1>
                         <div style={{marginBottom: 6}} onClick={handleCheck}>
                             <RadioButton checked={isChecked} />
+                        </div>
+                        <div style={{position: 'absolute', width: '100%', height: '100%', zIndex: 3000}}>
+
                         </div>
                     </RadioButtonWrapper>
                     <Input {...register('desk')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder="Коментарий (необязательно)"></Input>
