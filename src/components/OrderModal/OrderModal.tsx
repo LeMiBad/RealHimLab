@@ -44,7 +44,7 @@ const Modal = styled.form<{dark: boolean, focus: boolean}>`
     background-color: ${props => props.dark? 'white' : 'black'};
     width: 100%;
     transition: 0.3s;
-    height: ${props => props.focus? "600%" : "100%"};   
+    height: ${props => props.focus? "700%" : "130%"};   
     display: flex;
     z-index: 302;
     justify-content: flex-start;
@@ -105,7 +105,27 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
     const [validate, setValidate] = useState(false)
     const {register, control, getValues} = useForm<IForm>({defaultValues: {phone: '', name: tgUserName}})
     const [isChecked, setIsChecked] = useState(false)
-    const handleCheck = () => setIsChecked(isChecked? false : true)
+    const [isChecked2, setIsChecked2] = useState(true)
+    const handleCheck = () => {
+        if(isChecked) {
+            setIsChecked(false)
+            setIsChecked2(true)
+        }
+        else {
+            setIsChecked(true)
+            setIsChecked2(false)
+        }
+    }
+    const handleCheck2 = () => {
+        if(isChecked2) {
+            setIsChecked2(false)
+            setIsChecked(true)
+        }
+        else {
+            setIsChecked2(true)
+            setIsChecked(false)
+        }
+    }
 
 
     const accepHandler = async () => {
@@ -236,8 +256,17 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
                     />
                     <RadioButtonWrapper dark={dark} onClick={handleCheck}>
                         <h1>Самовызов</h1>
-                        <div style={{marginBottom: 6}} onClick={handleCheck}>
+                        <div style={{marginBottom: 6}}>
                             <RadioButton checked={isChecked} />
+                        </div>
+                        <div style={{position: 'absolute', width: '100%', height: '100%', zIndex: 3000}}>
+
+                        </div>
+                    </RadioButtonWrapper>
+                    <RadioButtonWrapper dark={dark} onClick={handleCheck2}>
+                        <h1>Доставка</h1>
+                        <div style={{marginBottom: 6}}>
+                            <RadioButton checked={isChecked2} />
                         </div>
                         <div style={{position: 'absolute', width: '100%', height: '100%', zIndex: 3000}}>
 
