@@ -64,7 +64,7 @@ const useMainButton = () => {
         else return null
     }
     else if(pageId === 2) {
-        if(basketSum) return <>
+        if(basket.length) return <>
             {modal? <OrderModal modalHandler={modalHandler}/> : null}
             <MainButton func={() => {modalHandler();toBasket()}}>{`Перейти к оформлению`}</MainButton>
         </>

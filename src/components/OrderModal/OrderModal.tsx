@@ -76,13 +76,18 @@ const MainButton = styled.button<{dark: boolean, warning?: boolean, focus?: bool
     color: ${props => props.dark? 'black' : 'white'};
 `
 
-const RadioButtonWrapper = styled.div`
+const RadioButtonWrapper = styled.div<{dark: boolean}>`
     display: flex;
-    color: white;
+    color: ${props => props.dark? 'black' : 'black'};
+    background-color: white;
+    padding: 10px;
     justify-content: space-between;
     align-items: center;
+    border-radius: 5px;
+    ${props => props.dark? 'border: 1px solid black;' : ''}
     h1 {
         font-size: 20px;
+        font-weight: 400;
     }
 `
 
@@ -202,7 +207,6 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
         </Wrapper>
     )
 
-    console.log(isChecked)
 
     return (
         <>
@@ -229,15 +233,17 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
                             />
                         )}
                     />
-                    <RadioButtonWrapper onClick={handleCheck}>
+                    <RadioButtonWrapper dark={dark} onClick={handleCheck}>
                         <h1>Самовызов</h1>
-                        <RadioButton checked={isChecked} />
+                        <div style={{marginBottom: 6}} onClick={handleCheck}>
+                            <RadioButton checked={isChecked} />
+                        </div>
                     </RadioButtonWrapper>
                     <Input {...register('desk')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder="Коментарий (необязательно)"></Input>
                     {
                         isChecked?
                         <Input {...register('location')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder={'Адрес'}></Input>
-                        : 
+                        :
                         null
                     }
                     {validate? <MainButton focus={focus} onClick={accepHandler} dark={dark}>Оформить</MainButton>
