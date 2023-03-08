@@ -80,14 +80,14 @@ const RadioButtonWrapper = styled.div<{dark: boolean}>`
     display: flex;
     color: ${props => props.dark? 'black' : 'black'};
     background-color: white;
-    padding: 10px;
+    padding: 5px 5px 5px 10px;
     justify-content: space-between;
     align-items: center;
     border-radius: 5px;
     ${props => props.dark? 'border: 1px solid black;' : ''}
     position: relative;
     h1 {
-        font-size: 20px;
+        font-size: 17px;
         font-weight: 400;
     }
 `
@@ -104,24 +104,16 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
     const [isEnd, setIsEnd] = useState(false)
     const [validate, setValidate] = useState(false)
     const {register, control, getValues} = useForm<IForm>({defaultValues: {phone: '', name: tgUserName}})
-    const [isChecked, setIsChecked] = useState(false)
-    const [isChecked2, setIsChecked2] = useState(true)
+    const [isChecked, setIsChecked] = useState(true)
+    const [isChecked2, setIsChecked2] = useState(false)
     const handleCheck = () => {
-        if(isChecked) {
-            setIsChecked(false)
-            setIsChecked2(true)
-        }
-        else {
+        if (!isChecked) {
             setIsChecked(true)
             setIsChecked2(false)
         }
     }
     const handleCheck2 = () => {
-        if(isChecked2) {
-            setIsChecked2(false)
-            setIsChecked(true)
-        }
-        else {
+        if (!isChecked2) {
             setIsChecked2(true)
             setIsChecked(false)
         }
@@ -254,15 +246,6 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
                             />
                         )}
                     />
-                    <RadioButtonWrapper dark={dark} onClick={handleCheck}>
-                        <h1>Самовызов</h1>
-                        <div style={{marginBottom: 6}}>
-                            <RadioButton checked={isChecked} />
-                        </div>
-                        <div style={{position: 'absolute', width: '100%', height: '100%', zIndex: 3000}}>
-
-                        </div>
-                    </RadioButtonWrapper>
                     <RadioButtonWrapper dark={dark} onClick={handleCheck2}>
                         <h1>Доставка</h1>
                         <div style={{marginBottom: 6}}>
@@ -272,9 +255,18 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
 
                         </div>
                     </RadioButtonWrapper>
+                    <RadioButtonWrapper dark={dark} onClick={handleCheck}>
+                        <h1>Самовызов</h1>
+                        <div style={{marginBottom: 6}}>
+                            <RadioButton checked={isChecked} />
+                        </div>
+                        <div style={{position: 'absolute', width: '100%', height: '100%', zIndex: 3000}}>
+
+                        </div>
+                    </RadioButtonWrapper>
                     <Input {...register('desk')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder="Коментарий (необязательно)"></Input>
                     {
-                        isChecked?
+                        isChecked2?
                         <Input {...register('location')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder={'Адрес'}></Input>
                         :
                         null
