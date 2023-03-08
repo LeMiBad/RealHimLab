@@ -80,7 +80,7 @@ const RadioButtonWrapper = styled.div<{dark: boolean}>`
     display: flex;
     color: ${props => props.dark? 'black' : 'black'};
     background-color: white;
-    padding: 5px 5px 5px 10px;
+    padding: 3px 3px 3px 10px;
     justify-content: space-between;
     align-items: center;
     border-radius: 5px;
