@@ -11,6 +11,9 @@ import 'react-phone-input-2/lib/style.css'
 import Loader from "../Ui/Loader/Loader"
 import { Controller, useForm } from "react-hook-form"
 import { IForm } from "./form"
+import ArrowIcon from "../Ui/ArrowIcon/ArrowIcon"
+import { Checkbox } from "@mui/material"
+import RadioButton from "./Radio"
 
 
 interface OrderModalProps {
@@ -73,6 +76,17 @@ const MainButton = styled.button<{dark: boolean, warning?: boolean, focus?: bool
     color: ${props => props.dark? 'black' : 'white'};
 `
 
+const RadioButtonWrapper = styled.div`
+    display: flex;
+    color: white;
+    justify-content: space-between;
+    align-items: center;
+    h1 {
+        font-size: 20px;
+    }
+`
+
+
 const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
     const {dark, tgUserName, tgNickName} = useStore($tgInfo)
     const sklad = useStore($pickedSaleDot)
@@ -84,6 +98,8 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
     const [isEnd, setIsEnd] = useState(false)
     const [validate, setValidate] = useState(false)
     const {register, control, getValues} = useForm<IForm>({defaultValues: {phone: '', name: tgUserName}})
+    const [isChecked, setIsChecked] = useState(false)
+    const handleCheck = () => setIsChecked(isChecked? false : true)
 
 
     const accepHandler = async () => {
@@ -186,6 +202,7 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
         </Wrapper>
     )
 
+    console.log(isChecked)
 
     return (
         <>
@@ -212,8 +229,17 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
                             />
                         )}
                     />
+                    <RadioButtonWrapper onClick={handleCheck}>
+                        <h1>Самовызов</h1>
+                        <RadioButton checked={isChecked} />
+                    </RadioButtonWrapper>
                     <Input {...register('desk')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder="Коментарий (необязательно)"></Input>
-                    <Input {...register('location')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder={'Адрес'}></Input>
+                    {
+                        isChecked?
+                        <Input {...register('location')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder={'Адрес'}></Input>
+                        : 
+                        null
+                    }
                     {validate? <MainButton focus={focus} onClick={accepHandler} dark={dark}>Оформить</MainButton>
                     : <MainButton warning={true} focus={focus} dark={dark}>Оформить</MainButton>}
                 </Modal>
