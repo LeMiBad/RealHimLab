@@ -266,13 +266,13 @@ const OrderModal: React.FC<OrderModalProps> = ({modalHandler}) => {
                             </div>
                         </RadioButtonWrapper>
                     </div>
-                    <Input {...register('desk')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder="Коментарий (необязательно)"></Input>
                     {
                         isChecked2?
                         <Input {...register('location')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder={'Адрес'}></Input>
                         :
                         null
                     }
+                    <Input {...register('desk')} onFocus={focusHandler} onBlur={unFocusHandler} placeholder="Коментарий (необязательно)"></Input>
                     {validate? <MainButton focus={focus} onClick={accepHandler} dark={dark}>Оформить</MainButton>
                     : <MainButton warning={true} focus={focus} dark={dark}>Оформить</MainButton>}
                 </Modal>
